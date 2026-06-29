@@ -1,0 +1,18 @@
+[
+  {
+    "id": "general",
+    "name": "Notions générales"
+  },
+  {
+    "id": "threats",
+    "name": "Menaces et attaques"
+  },
+  {
+    "id": "prevention",
+    "name": "Prévention et bonnes pratiques"
+  },
+  {
+    "id": "incident",
+    "name": "Réaction en cas d'incident"
+  }
+]
