@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mot de passe oublié - Secrétaire Virtuelle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root[data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-blue: #0ea5e9;
+            --btn-bg: #0f172a;
+            --btn-text: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #e2e8f0;
+            --bg-pattern: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+        }
+
+        :root[data-theme="dark"] {
+            --bg-color: #081a25;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --accent-blue: #0ea5e9;
+            --btn-bg: var(--accent-blue);
+            --btn-text: #ffffff;
+            --card-bg: rgba(15, 23, 26, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --bg-pattern: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            background-image: var(--bg-pattern);
+            background-size: 40px 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .header-icon {
+            color: var(--accent-blue);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            line-height: 1.6;
+            background: rgba(14, 165, 233, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            text-align: left;
+        }
+
+        .input-group { text-align: left; margin-bottom: 24px; }
+        .input-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 9999px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="header-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+            </svg>
+        </div>
+        <h1 class="title">Mot de passe oublié</h1>
+        <p class="subtitle">Entrez l'adresse email associée à votre compte pour recevoir un lien de réinitialisation.</p>
+
+        {% if get_flashed_messages() %}
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="error-msg" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2); color: #3b82f6;">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('auth.forgot_password') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="input-group">
+                <label for="email" style="margin-bottom: 8px; display: block;">Adresse Email de votre compte</label>
+                <input type="email" id="email" name="email" class="input-field" required placeholder="contact@entreprise.com">
+            </div>
+            
+            <button type="submit" class="btn-submit">
+                Recevoir le lien
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </form>
+        
+        <div style="margin-top: 24px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+            <a href="{{ url_for('auth.login') }}" style="color: var(--accent-blue); font-weight: 600; text-decoration: none;">&larr; Retour à la connexion</a>
+        </div>
+    </div>
+
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>

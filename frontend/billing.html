@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Facturation') }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.billing-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.quota-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 40px;
+}
+.quota-title {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+}
+.quota-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.quota-numbers {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.quota-numbers span {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+.progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    width: {{ (user.quota_used / user.quota_messages * 100) if user.quota_messages > 0 else 0 }}%;
+    transition: width 0.5s ease;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+.plan-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+.plan-card:hover {
+    transform: translateY(-10px);
+}
+.plan-card.active {
+    border-color: var(--accent);
+    background: linear-gradient(180deg, rgba(59, 167, 255, 0.05) 0%, transparent 100%);
+}
+.plan-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+.plan-name {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+.plan-price {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 25px;
+}
+.plan-price span {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    text-align: left;
+}
+.plan-features li {
+    padding: 10px 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.plan-features li i {
+    color: var(--accent);
+    margin-right: 10px;
+}
+.plan-features li:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="billing-container">
+    <div class="quota-card">
+        <div class="quota-title">{{ _('Consommation actuelle') }}</div>
+        <div class="quota-stats">
+            <div class="quota-numbers">{{ user.quota_used }} <span>/ {{ user.quota_messages }} {{ _('messages') }}</span></div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                {{ _('Plan actuel :') }} <span style="color: var(--accent); font-weight: bold;">{{ plans[user.plan_id].name if user.plan_id in plans else 'Free' }}</span>
+            </div>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill"></div>
+        </div>
+    </div>
+
+    <h2 style="margin-bottom: 30px; text-align: center;">{{ _('Passez à la vitesse supérieure') }}</h2>
+
+    <div class="plans-grid">
+        <!-- Free Plan -->
+        <div class="plan-card {% if user.plan_id == 'free' %}active{% endif %}">
+            {% if user.plan_id == 'free' %}
+            <div class="plan-badge">{{ _('Actuel') }}</div>
+            {% endif %}
+            <div class="plan-name">Free</div>
+            <div class="plan-price">0€<span>/mois</span></div>
+            <ul class="plan-features">
+                <li><i class="ri-check-line"></i> 100 {{ _('messages par mois') }}</li>
+                <li><i class="ri-check-line"></i> {{ _('Widget basique') }}</li>
+                <li style="color: rgba(255,255,255,0.2)"><i class="ri-close-line" style="color: rgba(255,255,255,0.2)"></i> {{ _('Support prioritaire') }}</li>
+            </ul>
+            <button class="btn-primary" style="width: 100%; opacity: 0.5; cursor: not-allowed;" disabled>{{ _('Inclus') }}</button>
+        </div>
+
+        <!-- Starter Plan -->
+        <div class="plan-card {% if user.plan_id == 'starter' %}active{% endif %}">
+            {% if user.plan_id == 'starter' %}
+            <div class="plan-badge">{{ _('Actuel') }}</div>
+            {% endif %}
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">9€<span>/mois</span></div>
+            <ul class="plan-features">
+                <li><i class="ri-check-line"></i> 2 000 {{ _('messages par mois') }}</li>
+                <li><i class="ri-check-line"></i> {{ _('Widget personnalisable') }}</li>
+                <li><i class="ri-check-line"></i> {{ _('Support standard') }}</li>
+            </ul>
+            {% if user.plan_id == 'starter' %}
+                <button class="btn-primary" style="width: 100%; background: transparent; border: 1px solid var(--accent)">{{ _('Gérer l\'abonnement') }}</button>
+            {% else %}
+                <a href="{{ url_for('billing.checkout', plan_name='starter') }}" class="btn-primary" style="width: 100%; display: block; text-align: center;">{{ _('Choisir Starter') }}</a>
+            {% endif %}
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="plan-card {% if user.plan_id == 'pro' %}active{% endif %}">
+            {% if user.plan_id == 'pro' %}
+            <div class="plan-badge">{{ _('Actuel') }}</div>
+            {% endif %}
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">19€<span>/mois</span></div>
+            <ul class="plan-features">
+                <li><i class="ri-check-line"></i> 10 000 {{ _('messages par mois') }}</li>
+                <li><i class="ri-check-line"></i> {{ _('Marque blanche') }}</li>
+                <li><i class="ri-check-line"></i> {{ _('Support prioritaire (1h)') }}</li>
+            </ul>
+            {% if user.plan_id == 'pro' %}
+                <button class="btn-primary" style="width: 100%; background: transparent; border: 1px solid var(--accent)">{{ _('Gérer l\'abonnement') }}</button>
+            {% else %}
+                <a href="{{ url_for('billing.checkout', plan_name='pro') }}" class="btn-primary" style="width: 100%; display: block; text-align: center;">{{ _('Choisir Pro') }}</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

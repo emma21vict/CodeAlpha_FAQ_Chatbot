@@ -2,13 +2,418 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Centre d'Aide - Cybersécurité</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Assistant Pro - Environnement Haut de Gamme</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        :root {
+            --bg-deep: #020816;
+            --text-main: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.65);
+            --border-light: rgba(255, 255, 255, 0.08);
+            --neon-blue: #3BA7FF;
+            --neon-cyan: #59D8FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* 1. GRILLE ARRIÈRE-PLAN (Blueprint) */
+        .bg-grid {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(var(--border-light) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-light) 1px, transparent 1px);
+            background-size: 70px 70px;
+            opacity: 0.15;
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        /* 2. HALOS LUMINEUX */
+        .bg-halo {
+            position: fixed;
+            width: 80vw;
+            height: 80vw;
+            max-width: 800px;
+            max-height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(40,120,255,0.15), transparent 65%);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -2;
+            animation: breathe 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        /* Bruit Cinématographique */
+        .bg-noise {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+            opacity: 0.02;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* Glow Curseur Dynamique */
+        .cursor-glow {
+            position: fixed;
+            width: 400px; height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(89, 216, 255, 0.08), transparent 50%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+
+        /* NAVBAR FLOTTANTE */
+        nav {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            background: rgba(5, 15, 40, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-light);
+            border-radius: 999px;
+            z-index: 50;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(59, 167, 255, 0.4);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        /* BOUTONS */
+        .btn-primary {
+            background: rgba(25, 60, 120, 0.35);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(89, 216, 255, 0.3);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 15px rgba(59, 167, 255, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 167, 255, 0.3);
+            background: rgba(40, 90, 180, 0.4);
+            border-color: var(--neon-cyan);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 24px;
+            padding-top: 80px;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            max-width: 1000px;
+            margin-bottom: 32px;
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, #4DA8FF, #6FE3FF, #8CC7FF, #4DA8FF);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 5s infinite linear;
+            text-shadow: 0 0 20px rgba(80,170,255,0.5), 0 0 40px rgba(80,170,255,0.25);
+            display: inline-block;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* TESTIMONIAL CARDS */
+        .features {
+            padding: 100px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+
+        .feature-card {
+            background: rgba(5, 15, 40, 0.55);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 100%;
+            background: radial-gradient(circle at top left, rgba(59, 167, 255, 0.1), transparent 70%);
+            z-index: -1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(59, 167, 255, 0.3);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(59, 167, 255, 0.1);
+        }
+
+        .feature-icon {
+            width: 48px; height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+            color: var(--neon-cyan);
+        }
+
+        /* FLOATING MOCKUP */
+        .mockup-container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto 120px auto;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(5,15,40,0.8);
+            backdrop-filter: blur(20px);
+            padding: 16px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 80px rgba(59, 167, 255, 0.15);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .mockup-header {
+            display: flex; gap: 8px; margin-bottom: 16px; padding-left: 8px;
+        }
+        
+        .mockup-dot {
+            width: 12px; height: 12px; border-radius: 50%; background: #334155;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-16px); }
+        }
+
+        /* ANIMATION APPARITION (Scroll Reveal) */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            nav { width: 95%; padding: 12px 20px; }
+            .hero-actions { flex-direction: column; width: 100%; max-width: 300px; }
+            .nav-links { display: none; }
+        }
     </style>
 </head>
 <body>
-    <h1>Bienvenue sur le Portail de Cybersécurité</h1>
-    <p>Le serveur Flask fonctionne correctement !</p>
+
+    <div class="bg-noise"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-halo"></div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <nav>
+        <div class="logo">
+            <div class="logo-box">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
+            Assistant Pro
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('auth.login') }}" class="btn-primary" style="padding: 10px 20px; font-size: 0.9rem;">
+                Accès Client
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="reveal">Configurez votre environnement IA <br>en moins de <span class="shimmer-text">30 minutes</span></h1>
+        <p class="reveal">Déployez une Secrétaire Virtuelle intelligente sur WhatsApp, connectée à votre agenda et gérée par le modèle Gemini 1.5 Flash.</p>
+        
+        <div class="hero-actions reveal">
+            <a href="{{ url_for('auth.login') }}" class="btn-primary">
+                Démarrer l'intégration
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+            <a href="#" class="btn-secondary">Voir la documentation</a>
+        </div>
+    </section>
+
+    <div class="mockup-container reveal">
+        <div class="mockup-header">
+            <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+        </div>
+        <div style="background: rgba(0,0,0,0.5); border-radius: 12px; height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
+            [Interface d'Administration Virtuelle]
+        </div>
+    </div>
+
+    <section class="features">
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            </div>
+            <h3 style="margin-bottom: 12px; font-size: 1.5rem;">Connexion Webhook</h3>
+            <p style="color: var(--text-muted); line-height: 1.6;">L'agent intercepte les messages entrants via l'API officielle de Twilio en temps réel.</p>
+        </div>
+
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            </div>
+            <h3 style="margin-bottom: 12px; font-size: 1.5rem;">Prise de RDV Autonome</h3>
+            <p style="color: var(--text-muted); line-height: 1.6;">L'IA consulte votre calendrier en direct et planifie des événements sans intervention humaine.</p>
+        </div>
+
+        <div class="feature-card reveal">
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h3 style="margin-bottom: 12px; font-size: 1.5rem;">Sécurité Maximale</h3>
+            <p style="color: var(--text-muted); line-height: 1.6;">Validation cryptographique, protection CSRF et sessions durcies pour vos données sensibles.</p>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid var(--border-light); margin-top: 60px;">
+        © 2026 Assistant Pro IA. Propulsé par Google Gemini Flash.
+    </footer>
+
+    <script>
+        // Effet Curseur
+        const cursorGlow = document.getElementById('cursorGlow');
+        document.addEventListener('mousemove', (e) => {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+        });
+
+        // Animation de Scroll (Reveal)
+        const reveals = document.querySelectorAll('.reveal');
+        const revealOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+        
+        const revealObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, revealOptions);
+
+        reveals.forEach(reveal => {
+            revealObserver.observe(reveal);
+        });
+
+        // Activer les premiers éléments immédiatement
+        setTimeout(() => {
+            document.querySelectorAll('.hero .reveal').forEach(el => el.classList.add('active'));
+        }, 100);
+    </script>
 </body>
 </html>

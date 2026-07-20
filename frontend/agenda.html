@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Agenda IA{% endblock %}
+
+{% block extra_head %}
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Surcharge FullCalendar pour qu'il s'intègre au Dark/Light mode */
+    #calendar {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(20px);
+    }
+    
+    .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid {
+        border-color: var(--border-color) !important;
+    }
+    
+    .fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number {
+        color: var(--text-main);
+    }
+    
+    .fc-event {
+        cursor: pointer;
+        background-color: var(--accent-blue) !important;
+        border-color: var(--accent-blue) !important;
+    }
+    
+    .fc .fc-button-primary {
+        background-color: var(--btn-bg) !important;
+        border-color: var(--btn-bg) !important;
+        color: var(--btn-text) !important;
+    }
+    
+    .fc .fc-button-primary:hover {
+        opacity: 0.9;
+    }
+    
+    .fc .fc-button-primary:disabled {
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    Agenda Intelligent
+</h1>
+<p class="page-subtitle">Gérez vos disponibilités. L'IA lira cet agenda automatiquement pour informer vos interlocuteurs de votre emploi du temps du jour.</p>
+
+<div id="calendar"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            locale: 'fr',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            selectable: true,
+            editable: true,
+            events: '/api/events',
+            
+            // Ajouter un événement
+            select: function(info) {
+                var title = prompt('Titre de l\'événement :');
+                if (title) {
+                    fetch('/api/events', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            title: title,
+                            start: info.startStr,
+                            end: info.endStr
+                        })
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) {
+                            calendar.addEvent({
+                                id: data.id,
+                                title: title,
+                                start: info.startStr,
+                                end: info.endStr
+                            });
+                        }
+                    });
+                }
+                calendar.unselect();
+            },
+            
+            // Supprimer un événement
+            eventClick: function(info) {
+                if (confirm("Voulez-vous supprimer cet événement : " + info.event.title + " ?")) {
+                    fetch('/api/events/' + info.event.id, {
+                        method: 'DELETE'
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) {
+                            info.event.remove();
+                        }
+                    });
+                }
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

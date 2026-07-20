@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Consignes & Tonalité{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tone-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+    
+    .tone-card {
+        background: var(--input-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .tone-card:hover {
+        border-color: rgba(14, 165, 233, 0.5);
+        background: var(--hover-bg);
+    }
+    
+    .tone-card.selected {
+        border-color: var(--accent-blue);
+        background: rgba(14, 165, 233, 0.1);
+    }
+    
+    .tone-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+    
+    .tone-desc {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+    }
+    
+    /* Radio caché */
+    input[type="radio"][name="tone"] {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+    Consignes & Tonalité de l'IA
+</h1>
+<p class="page-subtitle">Configurez le comportement général et le style de langage de votre Secrétaire Virtuelle.</p>
+
+<form method="POST" action="{{ url_for('settings.instructions') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="glass-card" style="margin-bottom: 32px;">
+        <div class="card-title">1. Tonalité du langage</div>
+        <div class="tone-grid">
+            <label class="tone-card {% if tone == 'Professionnel' %}selected{% endif %}">
+                <input type="radio" name="tone" value="Professionnel" {% if tone == 'Professionnel' %}checked{% endif %} onchange="updateSelection(this)">
+                <div class="tone-header">👔 Professionnel</div>
+                <div class="tone-desc">Langage soutenu, vouvoiement obligatoire. Parfait pour des relations d'affaires très formelles.</div>
+            </label>
+            
+            <label class="tone-card {% if tone == 'Amical' %}selected{% endif %}">
+                <input type="radio" name="tone" value="Amical" {% if tone == 'Amical' %}checked{% endif %} onchange="updateSelection(this)">
+                <div class="tone-header">👋 Amical</div>
+                <div class="tone-desc">Tutoiement, langage chaleureux avec quelques emojis. Idéal pour des clients réguliers ou des collègues.</div>
+            </label>
+            
+            <label class="tone-card {% if tone == 'Familier' %}selected{% endif %}">
+                <input type="radio" name="tone" value="Familier" {% if tone == 'Familier' %}checked{% endif %} onchange="updateSelection(this)">
+                <div class="tone-header">🏠 Familier</div>
+                <div class="tone-desc">Très décontracté, vocabulaire de tous les jours. Comme si un ami de longue date gérait vos messages.</div>
+            </label>
+            
+            <label class="tone-card {% if tone == 'Amoureux' %}selected{% endif %}">
+                <input type="radio" name="tone" value="Amoureux" {% if tone == 'Amoureux' %}checked{% endif %} onchange="updateSelection(this)">
+                <div class="tone-header">❤️ Amoureux</div>
+                <div class="tone-desc">Doux, affectueux, intime. Réservé à vos proches ou si vous voulez un assistant ultra-mignon.</div>
+            </label>
+        </div>
+    </div>
+
+    <div class="glass-card">
+        <div class="card-title">2. Consignes Générales</div>
+        <div class="form-group">
+            <label for="instructions">Instructions globales (Tarifs, règles spécifiques, etc.)</label>
+            <textarea id="instructions" name="instructions" placeholder="Ex: Si quelqu'un demande mes tarifs, dis que c'est 50€. Ne donne jamais mon adresse personnelle.">{{ instructions }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn-submit">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+            Enregistrer les paramètres
+        </button>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateSelection(radio) {
+        document.querySelectorAll('.tone-card').forEach(card => card.classList.remove('selected'));
+        if(radio.checked) {
+            radio.closest('.tone-card').classList.add('selected');
+        }
+    }
+</script>
+{% endblock %}
